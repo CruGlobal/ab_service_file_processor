@@ -1,17 +1,17 @@
 ##
-## digiserve/ab-file-processor:develop
+## digiserve/ab-file-processor:master
 ##
 ## This is our microservice for our AppBuilder Definitions.
 ##
 ## Docker Commands:
 ## ---------------
-## $ docker build -t digiserve/ab-file-processor:develop .
-## $ docker push digiserve/ab-file-processor:develop
+## $ docker build -t digiserve/ab-file-processor:master .
+## $ docker push digiserve/ab-file-processor:master
 ##
 
-FROM digiserve/service-cli:develop
+FROM digiserve/service-cli:master
 
-RUN git clone --recursive https://github.com/appdevdesigns/ab_service_file_processor.git app && cd app && git checkout develop && git submodule update --recursive && npm install --force
+RUN git clone --recursive https://github.com/appdevdesigns/ab_service_file_processor.git app && cd app && git submodule update --recursive && npm install --force
 
 WORKDIR /app
 
