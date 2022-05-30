@@ -24,9 +24,9 @@
     "devBrk": "node --inspect-brk=0.0.0.0:9229 app.js",
     "devBuild": "run-script-os",
     "devInstall": "run-script-os",
-    "devBuild:win32": "del node_modules\\.yarn-integrity && docker run -it --mount type=bind,source=%cd%,target=/app -w /app node yarn",
+    "devBuild:win32": "docker run -it --mount type=bind,source=%cd%,target=/app -w /app node /bin/bash -c \"npm i && cd AppBuilder && npm i\"",
     "devInstall:win32": "docker run -it --mount type=bind,source=%cd%,target=/app -w /app node bash",
-    "devBuild:darwin:linux": "rm node_modules/.yarn-integrity && docker run -it --mount type=bind,source=\"$(pwd)\",target=/app -w /app node yarn",
+    "devBuild:darwin:linux": "docker run -it --mount type=bind,source=\"$(pwd)\",target=/app -w /app node /bin/bash -c \"npm i && cd AppBuilder && npm i\"",
     "devInstall:darwin:linux": "docker run -it --mount type=bind,source=\"$(pwd)\",target=/app -w /app node bash"
   },
   "devDependencies": {
