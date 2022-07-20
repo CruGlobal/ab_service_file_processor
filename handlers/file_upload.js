@@ -94,12 +94,6 @@ module.exports = {
             // {string}
             // the path + filename of the stored file
 
-            // var config = req.config();
-            // var destPath = path.join(
-            //    config.basePath,
-            //    req.tenantID(),
-            //    "file_processor"
-            // );
             var destPath = PathUtils.destPath(req);
 
             async.series(
@@ -112,16 +106,12 @@ module.exports = {
                   // move file to new location
                   move: (next) => {
                      var fileName = req.param("name");
-                     var tempPath = path.join(
-                        config.basePath,
-                        config.uploadPath,
-                        fileName
-                     );
+                     var tempPath = PathUtils.tempPath(req, fileName);
                      pathFile = path.join(destPath, fileName);
                      fs.rename(tempPath, pathFile, function (err) {
                         if (err) {
                            req.notify.developer(err, {
-                              context: `Service:file_processor.file_upload: Error moving file [${tempPath}] -> [${newPath}] `,
+                              context: `Service:file_processor.file_upload: Error moving file [${tempPath}] -> [${pathFile}] `,
                               tempPath,
                               pathFile,
                            });

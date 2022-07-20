@@ -41,4 +41,17 @@ module.exports = {
          }
       });
    },
+
+   /**
+    * @function tempPath
+    * return the temporary path for a file named fileName.
+    * @param {ABUtils.Request} req
+    * @param {string} fileName
+    *        the name of the temp file.
+    * @return {string}
+    */
+   tempPath: (req, fileName) => {
+      var config = req.config();
+      return path.join(config.basePath, config.uploadPath, fileName);
+   },
 };
