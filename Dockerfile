@@ -5,8 +5,8 @@
 ##
 ## Docker Commands:
 ## ---------------
-## $ docker build -t digiserve/ab-file-processor:develop .
-## $ docker push digiserve/ab-file-processor:develop
+## $ docker build -t digiserve/ab-file-processor:master .
+## $ docker push digiserve/ab-file-processor:master
 ##
 
 ARG BRANCH=master
