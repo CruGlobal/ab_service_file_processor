@@ -13,7 +13,7 @@
     "moment": "^2.29.1",
     "mysql": "^2.17.1",
     "nodemon": "^2.0.4",
-    "objection": "^2.2.15",
+    "objection": "github:Hiro-Nakamura/objection.js#fixDBErrors",
     "xml-js": "^1.6.11"
   },
   "scripts": {
