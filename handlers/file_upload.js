@@ -6,6 +6,7 @@
 const async = require("async");
 const fs = require("fs");
 const path = require("path");
+const child_process = require("child_process");
 
 const PathUtils = require("../utils/pathUtils.js");
 
@@ -90,6 +91,7 @@ module.exports = {
                return;
             }
 
+            const tempPath = PathUtils.tempPath(req, fileName);
             var pathFile;
             // {string}
             // the path + filename of the stored file
@@ -98,6 +100,26 @@ module.exports = {
 
             async.series(
                {
+                  // Scan for malware
+                  clamav: (next) => {
+                     if (!process.env.CLAMAV_ENABLED == "true") {
+                        return next();
+                     }
+                     child_process.execFile(
+                        "clamscan",
+                        [ tempPath, "--remove=yes", "--quiet" ],
+                        (err, stdout, stderr) => {
+                           if (err) {
+                              // Could be a virus found. Or some system error.
+                              req.log(stderr);
+                              next(err);
+                           } else {
+                              next();
+                           }
+                        }
+                     );
+                  },
+
                   // make sure destination directory is created
                   make: (next) => {
                      PathUtils.makePath(destPath, req, next);
@@ -106,7 +128,6 @@ module.exports = {
                   // move file to new location
                   move: (next) => {
                      var fileName = req.param("name");
-                     var tempPath = PathUtils.tempPath(req, fileName);
                      pathFile = path.join(destPath, fileName);
                      fs.rename(tempPath, pathFile, function (err) {
                         if (err) {
