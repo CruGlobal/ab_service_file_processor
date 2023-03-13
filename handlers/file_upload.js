@@ -91,6 +91,7 @@ module.exports = {
                return;
             }
 
+            const fileName = req.param("name");
             const tempPath = PathUtils.tempPath(req, fileName);
             var pathFile;
             // {string}
@@ -106,12 +107,19 @@ module.exports = {
                         return next();
                      }
                      child_process.execFile(
-                        "clamscan",
+                        "clamdscan",
                         [ tempPath, "--remove=yes", "--quiet" ],
                         (err, stdout, stderr) => {
                            if (err) {
-                              // Could be a virus found. Or some system error.
-                              req.log(stderr);
+                              // ClamAV found a virus
+                              if (err.code == 1) {
+                                err.message = "Malware detected in upload";
+                              }
+                              // Some other system error
+                              else {
+                                req.log("Problem running ClamAV");
+                                req.log(stderr);
+                              }
                               next(err);
                            } else {
                               next();
@@ -127,7 +135,6 @@ module.exports = {
 
                   // move file to new location
                   move: (next) => {
-                     var fileName = req.param("name");
                      pathFile = path.join(destPath, fileName);
                      fs.rename(tempPath, pathFile, function (err) {
                         if (err) {

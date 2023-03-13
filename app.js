@@ -22,7 +22,17 @@ if (process.env.CLAMAV_ENABLED == "true") {
 				console.error(err);
 			} else {
 				// Automatically refresh virus definition DB throughout the day
-				child_process.execFile("freshclam", [ "-d" ]);
+				child_process.execFile("freshclam", [ "-d", "--daemon-notify" ]);
+				// Load the ClamAV daemon
+				child_process.execFile("clamd", (err, stdout, stderr) => {
+					if (err) {
+						console.error("Could not start ClamAV daemon.")
+						console.error(stderr);
+						console.error(err);
+					} else {
+						console.log("ClamAV daemon ready");
+					}
+				});
 			}
 		}
 	);

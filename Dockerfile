@@ -17,6 +17,8 @@ FROM digiserve/service-cli:${BRANCH}
 RUN apt-get update
 
 RUN apt-get install -y clamav clamav-daemon
+RUN mkdir /var/run/clamav
+RUN chown clamav:clamav /var/run/clamav
 
 COPY . /app
 
