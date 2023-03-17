@@ -103,7 +103,7 @@ module.exports = {
                {
                   // Scan for malware
                   clamav: (next) => {
-                     if (!process.env.CLAMAV_ENABLED == "true") {
+                     if (!(process.env.CLAMAV_ENABLED == "true")) {
                         return next();
                      }
                      child_process.execFile(
