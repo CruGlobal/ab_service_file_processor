@@ -2,7 +2,7 @@
  * model.js
  * define our DB operations.
  */
-const AB = require("ab-utils");
+const AB = require("@digiserve/ab-utils");
 module.exports = {
     table_name: "op_fileupload",
     attributes: {

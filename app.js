@@ -3,7 +3,7 @@
 // A service to manage uploaded files.
 //
 // const path = require("path");
-const AB = require("ab-utils");
+const AB = require("@digiserve/ab-utils");
 const child_process = require("child_process");
 
 var controller = AB.controller("file_processor");
