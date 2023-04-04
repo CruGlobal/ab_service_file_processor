@@ -6,14 +6,14 @@
   "author": "Johnny Hausman",
   "license": "MIT",
   "dependencies": {
-    "ab-utils": "github:hiro-nakamura/ab-utils",
+    "@digiserve/ab-utils": "1.4.0",
     "cote": "^1.0.2",
     "knex": "^0.95.4",
     "lodash": "^4.17.13",
     "moment": "^2.29.1",
     "mysql": "^2.17.1",
     "nodemon": "^2.0.4",
-    "objection": "^2.2.15",
+    "objection": "^2.2.18",
     "xml-js": "^1.6.11"
   },
   "scripts": {
@@ -36,7 +36,7 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^4.2.5",
-    "mocha": "^8.1.2",
+    "mocha": "^10.2.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
