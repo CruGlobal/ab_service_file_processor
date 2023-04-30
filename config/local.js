@@ -1,18 +1,8 @@
 /*
  * File_Processor
  */
-function env(envKey, defaultValue) {
-   if (typeof process.env[envKey] == "undefined") {
-      return defaultValue;
-   }
-   try {
-      return JSON.parse(process.env[envKey]);
-   } catch (e) {
-      console.log(e);
-      console.log(process.env[envKey]);
-      return process.env[envKey];
-   }
-}
+const AB = require("@digiserve/ab-utils");
+const env = AB.defaults.env;
 const path = require("path");
 
 module.exports = {
@@ -48,22 +38,5 @@ module.exports = {
     * datastores:
     * Sails style DB connection settings
     */
-   datastores: {
-      appbuilder: {
-         adapter: "sails-mysql",
-         host: env("MYSQL_HOST", "db"),
-         port: env("MYSQL_PORT", 3306),
-         user: env("MYSQL_USER", "root"),
-         password: process.env.MYSQL_PASSWORD,
-         database: env("MYSQL_DBPREFIX", "appbuilder"),
-      },
-      site: {
-         adapter: "sails-mysql",
-         host: env("MYSQL_HOST", "db"),
-         port: env("MYSQL_PORT", 3306),
-         user: env("MYSQL_USER", "root"),
-         password: process.env.MYSQL_PASSWORD,
-         database: env("MYSQL_DBADMIN", "appbuilder-admin"),
-      },
-   },
+   datastores: AB.defaults.datastores(),
 };
