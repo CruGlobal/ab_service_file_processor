@@ -32,7 +32,7 @@ module.exports = {
     *        a node style callback(err, results) to send data when job is finished
     */
    fn: async function handler(req, cb) {
-      req.log("file_processor.file-base64:");
+      req.log(`${serviceKey}:`);
 
       try {
          // get the AB for the current tenant
