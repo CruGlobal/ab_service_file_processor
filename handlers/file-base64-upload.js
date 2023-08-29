@@ -6,7 +6,6 @@
 const async = require("async");
 const fs = require("fs");
 const path = require("path");
-// const Jimp = require("jimp");
 const PathUtils = require("../utils/pathUtils.js");
 const child_process = require("child_process");
 
@@ -28,7 +27,7 @@ module.exports = {
       field: { string: { uuid: true }, required: true },
       file: { string: true, required: true }, // raw base64 file
       uploadedBy: { string: true, required: false },
-      size: { number: true, required: true },
+      size: { number: true, required: true }, // we reject oversized files on upload
       type: { string: true, required: true },
       fileName: { string: true, required: true },
    },
@@ -82,8 +81,6 @@ module.exports = {
          const photoID = req.param("photoID");
          let file = req.param("file");
 
-         const fileData = Buffer.from(file, "base64");
-
          const size = req.param("size");
          const type = req.param("type");
 
@@ -100,16 +97,31 @@ module.exports = {
          const fileName = req.param("fileName");
          const uploadedBy = req.param("uploadedBy") ?? req.user.username;
 
-         const uniqueFileName = fileName.concat(
-            "_",
-            photoID,
-            getFileExtensionFromType(type)
-         );
-
-         //
          async.series(
             {
-               // TODO @achoobert
+               // make sure destination directory is created
+               make: (next) => {
+                  PathUtils.makePath(destPath, req, next);
+               },
+               // create file to new location
+               create: (next) => {
+                  pathFile = path.join(destPath, fileName);
+                  // Write the file data to the specified path
+                  fs.writeFile(pathFile, file, "base64", (err) => {
+                     if (err) {
+                        req.notify.developer(err, {
+                           context: `Service:${serviceKey}: Error writing file '${pathFile}'`,
+                        });
+                        next(err);
+                     } else {
+                        req.notify.developer({
+                           context: `Service:${serviceKey}: File written successfully '${pathFile}'`,
+                        });
+                        next();
+                     }
+                  });
+               },
+
                // Scan for malware
                clamav: (next) => {
                   if (!(process.env.CLAMAV_ENABLED == "true")) {
@@ -117,11 +129,12 @@ module.exports = {
                   }
                   child_process.execFile(
                      "clamdscan",
-                     [tempPath, "--remove=yes", "--quiet"],
+                     [pathFile, "--remove=yes", "--quiet"],
                      (err, stdout, stderr) => {
                         if (err) {
                            // ClamAV found a virus
                            if (err.code == 1) {
+                              req.log("Malware detected in upload");
                               err.message = "Malware detected in upload";
                            }
                            // Some other system error
@@ -136,54 +149,26 @@ module.exports = {
                      }
                   );
                },
-               // make sure destination directory is created
-               make: (next) => {
-                  PathUtils.makePath(destPath, req, next);
-               },
-               // create file to new location
-               create: (next) => {
-                  pathFile = path.join(destPath, uniqueFileName);
-                  var filePath = pathFile;
-                  // fs.rename(tempPath, pathFile, function (err) {
-                  //    if (err) {
-                  //       req.notify.developer(err, {
-                  //          context: `Service:file_processor.file_upload: Error moving file [${tempPath}] -> [${pathFile}] `,
-                  //          tempPath,
-                  //          pathFile,
-                  //       });
-                  //    } else {
-                  //       req.log(
-                  //          `moved file [${tempPath}] -> [${pathFile}] `
-                  //       );
-                  //    }
-                  //    next(err);
-                  // });
-                  // Write the file data to the specified path
-                  fs.writeFile(pathFile, file, "base64", (err) => {
-                     if (err) {
-                        req.notify.developer(err, {
-                           context: `Service:${serviceKey}: Error writing file '${pathFile}'`,
-                        });
-                     } else {
-                        req.notify.developer({
-                           context: `Service:${serviceKey}: File written successfully '${pathFile}'`,
-                        });
-                     }
-                  });
-               },
-
                // store file entry in DB
                uuid: (next) => {
-                  // uuid : the fileName without '.ext'
-                  // uuid = req.param("name").split(".")[0];
+                  // build info object
+                  let info = {
+                     name: fileName,
+                     object: objID,
+                     field: fieldID,
+                     size: size,
+                     type: type,
+                     fileName: fileName,
+                     uploadedBy: uploadedBy,
+                  };
 
                   var newEntry = {
-                     // uuid,
+                     uuid: photoID,
                      file: req.param("fileName"),
-                     pathFile,
+                     pathFile: pathFile,
                      size: req.param("size"),
                      type: req.param("type"),
-                     info: {},
+                     info: info,
                      object: objID,
                      field: fieldID,
                      uploadedBy: req.param("uploadedBy"),
@@ -210,42 +195,11 @@ module.exports = {
                   req.log("Error uploading file:", err);
                   cb(err);
                } else {
-                  cb(null, { uuid: results.uuid });
+                  let returnID = results?.uuid || photoID;
+                  cb(null, { uuid: returnID });
                }
             }
          );
-         //
-         // // if is a mobile fetch and file size is bigger than 2.5 MB
-         // // look for a mobile render, create it if needed
-         // if (isMobileImage && entry.size > 1.75 * 1000 * 1000) {
-         //    const pathSplit = entry.pathFile.split("/");
-         //    const mobileFileName = `mobile_${pathSplit.pop()}`;
-         //    pathSplit.push(mobileFileName);
-         //    const mobilePath = pathSplit.join("/");
-         //    const mobileRenderExists = await checkFileAccess(mobilePath);
-         //    if (!mobileRenderExists) {
-         //       try {
-         //          await createMobileRender(entry.pathFile, mobilePath, req);
-         //       } catch (err) {
-         //          // error already sent to notify.developer so just return
-         //          err.code = 500;
-         //          return cb(err);
-         //       }
-         //    }
-
-         //    filePath = mobilePath;
-         // }
-
-         // Read the file
-         // try {
-         //    const contents = await fs.readFile(filePath);
-         //    return cb(null, { image: contents });
-         // } catch (err) {
-         //    req.notify.developer(err, {
-         //       context: `Service:${serviceKey}: Error reading file '${filePath}'`,
-         //    });
-         //    return cb(err);
-         // }
       } catch (err) {
          req.notify.developer(err, {
             context: `Service:${serviceKey}: Error initializing ABFactory`,
@@ -254,46 +208,3 @@ module.exports = {
       }
    },
 };
-
-// /**
-//  * Uses Jimp to create and save a smaller sized image
-//  * @param {string} originalPath - path of the original image
-//  * @param {string} mobilePath - path to save the new image
-//  * @param {object} req - used to notify developers on errors
-//  */
-// async function createMobileRender(originalPath, mobilePath, req) {
-//    let jimpImage;
-//    try {
-//       jimpImage = await Jimp.read(originalPath);
-//    } catch (err) {
-//       req.notify.developer(err, {
-//          context: `Service:${serviceKey}: jimp error reading file '${originalPath}'`,
-//       });
-//       throw err;
-//    }
-//    try {
-//       jimpImage.scaleToFit(2000, 2000, Jimp.RESIZE_BEZIER);
-//       jimpImage.quality(80);
-//       await jimpImage.writeAsync(mobilePath);
-//    } catch (err) {
-//       req.notify.developer(err, {
-//          context: `Service:${serviceKey}: jimp error resizing/writing file '${mobilePath}'`,
-//       });
-//       throw err;
-//    }
-//    return;
-// }
-
-/**
- * Wrapper around fs.access to return true/false
- * @param {string} path file path
- * @returns {boolean}
- */
-async function checkFileAccess(path) {
-   try {
-      await fs.access(path, fs.constants.R_OK);
-      return true;
-   } catch (err) {
-      return false;
-   }
-}
