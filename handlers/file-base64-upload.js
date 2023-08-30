@@ -1,6 +1,6 @@
 /**
- * file-base64
- * return a file as base64
+ * file-base64-upload
+ * upload a file as base64
  * our Request handler.
  */
 const async = require("async");
@@ -22,12 +22,11 @@ module.exports = {
    key: serviceKey,
    inputValidation: {
       // uuid: { string: { uuid: true }, required: true },
-      photoID: { string: { uuid: true }, required: true },
+      fileID: { string: { uuid: true }, required: false },
       object: { string: { uuid: true }, required: true },
       field: { string: { uuid: true }, required: true },
       file: { string: true, required: true }, // raw base64 file
       uploadedBy: { string: true, required: false },
-      size: { number: true, required: true }, // we reject oversized files on upload
       type: { string: true, required: true },
       fileName: { string: true, required: true },
    },
@@ -43,56 +42,47 @@ module.exports = {
     */
    fn: async function handler(req, cb) {
       req.log(`${serviceKey}:`);
+      // get the AB for the current tenant
+      const AB = await ABBootstrap.init(req);
       var destPath = PathUtils.destPath(req);
+      const objID = req.param("object");
+      const fieldID = req.param("field");
+      // optional param, if not passed, generate a uuid
+      const uuid = req.param("fileID") || AB.uuid();
 
       try {
-         // get the AB for the current tenant
-         const AB = await ABBootstrap.init(req);
-         // const uuid = req.param("uuid");
-         const objID = req.param("object");
          var object = AB.objectByID(objID);
          if (!object) {
             var errObj = new Error(
                "file_processor.file_upload: unknown object reference"
             );
             req.notify.builder(errObj, {
-               object: req.param("object"),
+               object: objID,
             });
             cb(errObj);
             return;
          }
-         const fieldID = req.param("field");
-         if (fieldID != "defaultImage") {
-            var field = object.fieldByID(fieldID);
-            if (!field) {
-               var errField = new Error(
-                  "file_processor.file_upload: unknown field reference"
-               );
-               req.notify.builder(errField, {
-                  object,
-                  fieldID: req.param("field"),
-                  AB: AB,
-               });
-               cb(errField);
-               return;
-            }
+
+         var field = object.fieldByID(fieldID);
+         if (!field) {
+            var errField = new Error(
+               "file_processor.file_upload: unknown field reference"
+            );
+            req.notify.builder(errField, {
+               object,
+               fieldID: req.param("field"),
+               AB: AB,
+            });
+            cb(errField);
+            return;
          }
 
-         const photoID = req.param("photoID");
          let file = req.param("file");
 
-         const size = req.param("size");
-         const type = req.param("type");
+         // calculate size of file
+         const size = Buffer.from(file, "base64").length;
 
-         // Function to get file extension from type
-         function getFileExtensionFromType(fileType) {
-            const parts = fileType.split("/");
-            if (parts.length === 2) {
-               return "." + parts[1];
-            } else {
-               return "";
-            }
-         }
+         const type = req.param("type");
 
          const fileName = req.param("fileName");
          const uploadedBy = req.param("uploadedBy") ?? req.user.username;
@@ -152,26 +142,27 @@ module.exports = {
                // store file entry in DB
                uuid: (next) => {
                   // build info object
-                  let info = {
+                  const info = {
                      name: fileName,
+                     fileName,
                      object: objID,
                      field: fieldID,
-                     size: size,
-                     type: type,
-                     fileName: fileName,
-                     uploadedBy: uploadedBy,
+                     size,
+                     type,
+                     uploadedBy,
                   };
 
+                  // same as info plus a few other params
                   var newEntry = {
-                     uuid: photoID,
-                     file: req.param("fileName"),
-                     pathFile: pathFile,
-                     size: req.param("size"),
-                     type: req.param("type"),
+                     uuid,
+                     file: fileName,
+                     pathFile,
                      info: info,
                      object: objID,
                      field: fieldID,
-                     uploadedBy: req.param("uploadedBy"),
+                     size,
+                     type,
+                     uploadedBy,
                   };
                   var SiteFile = AB.objectFile().model();
                   req.retry(() => SiteFile.create(newEntry))
@@ -195,7 +186,7 @@ module.exports = {
                   req.log("Error uploading file:", err);
                   cb(err);
                } else {
-                  let returnID = results?.uuid || photoID;
+                  let returnID = results?.uuid || uuid;
                   cb(null, { uuid: returnID });
                }
             }
