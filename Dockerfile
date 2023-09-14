@@ -13,6 +13,13 @@ ARG BRANCH=master
 
 FROM digiserve/service-cli:${BRANCH}
 
+# Can skip this step if digiserve/service-cli is refreshed recently
+RUN apt-get update
+
+RUN apt-get install -y clamav clamav-daemon
+RUN mkdir /var/run/clamav
+RUN chown clamav:clamav /var/run/clamav
+
 COPY . /app
 
 WORKDIR /app

@@ -6,6 +6,7 @@
 const async = require("async");
 const fs = require("fs");
 const path = require("path");
+const child_process = require("child_process");
 
 const PathUtils = require("../utils/pathUtils.js");
 
@@ -42,7 +43,7 @@ module.exports = {
    inputValidation: {
       name: { string: true, required: true },
       object: { string: { uuid: true }, required: true },
-      field: { string: { uuid: true }, required: true },
+      field: { string: true, required: true },
       size: { number: { integer: true }, required: true },
       type: { string: true, required: true },
       fileName: { string: true, required: true },
@@ -64,7 +65,8 @@ module.exports = {
       // get the AB for the current tenant
       ABBootstrap.init(req)
          .then((AB) => {
-            var object = AB.objectByID(req.param("object"));
+            const objID = req.param("object");
+            var object = AB.objectByID(objID);
             if (!object) {
                var errObj = new Error(
                   "file_processor.file_upload: unknown object reference"
@@ -76,20 +78,25 @@ module.exports = {
                return;
             }
 
-            var field = object.fieldByID(req.param("field"));
-            if (!field) {
-               var errField = new Error(
-                  "file_processor.file_upload: unknown field reference"
-               );
-               req.notify.builder(errField, {
-                  object,
-                  fieldID: req.param("field"),
-                  AB: AB,
-               });
-               cb(errField);
-               return;
+            const fieldID = req.param("field");
+            if (fieldID != "defaultImage") {
+               var field = object.fieldByID(fieldID);
+               if (!field) {
+                  var errField = new Error(
+                     "file_processor.file_upload: unknown field reference"
+                  );
+                  req.notify.builder(errField, {
+                     object,
+                     fieldID: req.param("field"),
+                     AB: AB,
+                  });
+                  cb(errField);
+                  return;
+               }
             }
 
+            const fileName = req.param("name");
+            const tempPath = PathUtils.tempPath(req, fileName);
             var pathFile;
             // {string}
             // the path + filename of the stored file
@@ -98,6 +105,33 @@ module.exports = {
 
             async.series(
                {
+                  // Scan for malware
+                  clamav: (next) => {
+                     if (!(process.env.CLAMAV_ENABLED == "true")) {
+                        return next();
+                     }
+                     child_process.execFile(
+                        "clamdscan",
+                        [tempPath, "--remove=yes", "--quiet"],
+                        (err, stdout, stderr) => {
+                           if (err) {
+                              // ClamAV found a virus
+                              if (err.code == 1) {
+                                 err.message = "Malware detected in upload";
+                              }
+                              // Some other system error
+                              else {
+                                 req.log("Problem running ClamAV");
+                                 req.log(stderr);
+                              }
+                              next(err);
+                           } else {
+                              next();
+                           }
+                        }
+                     );
+                  },
+
                   // make sure destination directory is created
                   make: (next) => {
                      PathUtils.makePath(destPath, req, next);
@@ -105,8 +139,6 @@ module.exports = {
 
                   // move file to new location
                   move: (next) => {
-                     var fileName = req.param("name");
-                     var tempPath = PathUtils.tempPath(req, fileName);
                      pathFile = path.join(destPath, fileName);
                      fs.rename(tempPath, pathFile, function (err) {
                         if (err) {
@@ -136,8 +168,8 @@ module.exports = {
                         size: req.param("size"),
                         type: req.param("type"),
                         info: req.data,
-                        object: req.param("object"),
-                        field: req.param("field"),
+                        object: objID,
+                        field: fieldID,
                         uploadedBy: req.param("uploadedBy"),
                      };
                      var SiteFile = AB.objectFile().model();
