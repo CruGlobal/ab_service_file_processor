@@ -5,6 +5,17 @@
 // const path = require("path");
 const AB = require("@digiserve/ab-utils");
 const child_process = require("child_process");
+const { version } = require("./package");
+// Use sentry by default, but can override with env.TELEMETRY_PROVIDER
+if (AB.defaults.env("TELEMETRY_PROVIDER", "sentry") == "sentry") {
+   AB.telemetry.init("sentry", {
+      dsn: AB.defaults.env(
+         "SENTRY_DSN",
+         "https://095e01fe2fc16e08935122417f0dbac2@o144358.ingest.sentry.io/4506143774998528"
+      ),
+      release: version,
+   });
+}
 
 var controller = AB.controller("file_processor");
 // controller.afterStartup((cb)=>{ return cb(/* err */) });
