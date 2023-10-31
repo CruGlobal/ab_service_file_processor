@@ -99,6 +99,7 @@ module.exports = {
  * @param {object} req - used to notify developers on errors
  */
 async function createMobileRender(originalPath, mobilePath, req) {
+   req.performance.mark("mobileRender", { op: "file" });
    let jimpImage;
    try {
       jimpImage = await Jimp.read(originalPath);
@@ -118,6 +119,7 @@ async function createMobileRender(originalPath, mobilePath, req) {
       });
       throw err;
    }
+   req.performance.measure("mobileRender");
    return;
 }
 
