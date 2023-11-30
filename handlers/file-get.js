@@ -9,7 +9,7 @@ const ABBootstrap = require("../AppBuilder/ABBootstrap");
 // with the current tenant for the incoming request.
 const pathUtils = require("../utils/pathUtils.js");
 
-const getFilePath = async (req, file) => {
+const getFilePath = async (req, file, needOriginalImage) => {
    let filePath = file.pathFile;
    switch (file.type) {
       case "image/heic":
@@ -22,8 +22,8 @@ const getFilePath = async (req, file) => {
             parsedImagePath.dir,
             `${parsedImagePath.name}.webp`
          );
-         if (await pathUtils.checkPath(imageWEBPPath)) {
-            filePath = imageWEBPPath;
+         if ((await pathUtils.checkPath(imageWEBPPath))) {
+            if (!needOriginalImage) filePath = imageWEBPPath;
             break;
          }
          if (await pathUtils.checkPath(filePath))
@@ -73,6 +73,7 @@ module.exports = {
     */
    inputValidation: {
       uuid: { string: { uuid: true }, required: true },
+      needOriginalImage: { boolean: true, optional: true },
       // email: { string: { email: true }, optional: true },
    },
 
@@ -102,7 +103,13 @@ module.exports = {
             error.code = 404;
             throw error;
          }
-         cb(null, { url: await getFilePath(req, file) });
+         cb(null, {
+            url: await getFilePath(
+               req,
+               file,
+               req.param("needOriginalImage") ?? false
+            ),
+         });
       } catch (error) {
          req.notify.developer(error, {
             context: `Service:file_processor.file-get: ${errorContext}`,
