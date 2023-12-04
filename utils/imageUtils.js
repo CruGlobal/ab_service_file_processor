@@ -26,7 +26,7 @@ module.exports = {
       args.push(imagePath);
       const parsedImagePath = path.parse(imagePath);
       args.push(path.join(parsedImagePath.dir, `${parsedImagePath.name}.${extension}`));
-      await new Promise((resolve) => {
+      await new Promise((resolve, reject) => {
          exec(args.join(" "), (error) => {
             if (error) reject(error);
             resolve();
