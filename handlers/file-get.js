@@ -7,44 +7,8 @@ const ABBootstrap = require("../AppBuilder/ABBootstrap");
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
+const imageUtils = require("../utils/imageUtils.js");
 const pathUtils = require("../utils/pathUtils.js");
-
-const getFilePath = async (req, file, needOriginalImage) => {
-   let filePath = file.pathFile;
-   switch (file.type) {
-      case "image/heic":
-      case "image/jpeg":
-      case "image/png":
-      case "image/tiff":
-      case "image/webp":
-         const parsedImagePath = path.parse(filePath);
-         const imageWEBPPath = path.join(
-            parsedImagePath.dir,
-            `${parsedImagePath.name}.webp`
-         );
-         if ((await pathUtils.checkPath(imageWEBPPath))) {
-            if (!needOriginalImage) filePath = imageWEBPPath;
-            break;
-         }
-         if (await pathUtils.checkPath(filePath))
-            req.worker(
-               async (imagePath, extension) => {
-                  // I tried to figure out how to use require() but it is not working.
-                  // On Nodejs document say process.mainModule is deprecated but it's still working here.
-                  const path = process.mainModule.require("path");
-                  const imageUtils = process.mainModule.require(
-                     `${path.join(path.resolve(), "/utils/imageUtils.js")}`
-                  );
-                  await imageUtils.convert(imagePath, extension);
-               },
-               [filePath, "webp"]
-            );
-         break;
-      default:
-         break;
-   }
-   return filePath;
-};
 
 module.exports = {
    /**
@@ -73,7 +37,8 @@ module.exports = {
     */
    inputValidation: {
       uuid: { string: { uuid: true }, required: true },
-      needOriginalImage: { boolean: true, optional: true },
+      extension: { string: true, optional: true },
+      needOriginalFile: { boolean: true, optional: true },
       // email: { string: { email: true }, optional: true },
    },
 
@@ -92,7 +57,8 @@ module.exports = {
       try {
          // get the AB for the current tenant
          const AB = await ABBootstrap.init(req);
-         const SiteFile = AB.objectFile().model();
+         const fileObject = AB.objectFile();
+         const SiteFile = fileObject.model();
          const entry = await req.retry(() =>
             SiteFile.find({ uuid: req.param("uuid") })
          );
@@ -103,12 +69,41 @@ module.exports = {
             error.code = 404;
             throw error;
          }
+         if (req.param("needOriginalFile") ?? false) {
+            cb(null, {
+               url: file.pathFile,
+            });
+            return;
+         }
+         let filePath = file.pathFile;
+         const parsedFilePath = path.parse(filePath);
+         const newFileExtension = req.param("extension");
+         switch (file.type) {
+            case "image/heic":
+            case "image/jpeg":
+            case "image/png":
+            case "image/tiff":
+            case "image/webp":
+               {
+                  const newFilePath = path.join(
+                     parsedFilePath.dir,
+                     `${parsedFilePath.name}.${newFileExtension || "webp"}`
+                  );
+                  if (!fileObject.validExtension(newFilePath))
+                     throw new Error(`The file extension "${newFileExtension}" is invalid.`);
+                  if (!(await pathUtils.checkPath(newFilePath))) {
+                     if (await pathUtils.checkPath(filePath))
+                        imageUtils.convert(filePath, newFilePath);
+                     break;
+                  }
+                  filePath = newFilePath;
+               }
+               break;
+            default:
+               break;
+         }
          cb(null, {
-            url: await getFilePath(
-               req,
-               file,
-               req.param("needOriginalImage") ?? false
-            ),
+            url: filePath,
          });
       } catch (error) {
          req.notify.developer(error, {

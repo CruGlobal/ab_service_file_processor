@@ -2,12 +2,14 @@
  * image-upload
  * our Request handler for images being uploaded by the ABDesigner.
  */
+const path = require("path");
 const Handler_File_Upload = require("./file_upload.js");
 
 const ABBootstrap = require("../AppBuilder/ABBootstrap");
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
+const imageUtils = require("../utils/imageUtils.js");
 
 module.exports = {
    /**
@@ -25,6 +27,7 @@ module.exports = {
       type: { string: true, required: true },
       fileName: { string: true, required: true },
       uploadedBy: { string: true, required: true },
+      convertToExtensions: { array: true, optional: true },
    },
 
    /**
@@ -54,27 +57,50 @@ module.exports = {
          req.data.field = SiteUser.fields()[0].id;
 
          // Now reuse the file_upload handler to process the file:
-         Handler_File_Upload.fn(req, (err, results) => {
+         Handler_File_Upload.fn(req, async (err, results) => {
             if (err) {
                req.log("Error uploading image:", err);
                cb(err);
                return;
             }
-
             // go ahead and return the response to the user
             cb(null, results);
-
-            // on a successful save, we need to modify the entry to
-            // remove the object & file references.
-            const SiteFile = AB.objectFile().model();
-            SiteFile.update(results.uuid, { object: null, field: null }).catch(
-               (err) => {
-                  req.notify.developer(err, {
-                     context:
-                        "Service:file_processor.image-upload: Error updating uploaded image",
-                  });
-               }
-            );
+            let errorContext =
+               "Service:file_processor.image-upload: Error updating uploaded image";
+            try {
+               // on a successful save, we need to modify the entry to
+               // remove the object & file references.
+               const SiteFile = AB.objectFile().model();
+               const { pathFile } = await req.retry(() =>
+                  SiteFile.update(results.uuid, {
+                     object: null,
+                     field: null,
+                  })
+               );
+               errorContext =
+                  "Service:file_processor.image-upload: Error converting uploaded image";
+               const convertToExtensions = req.param("convertToExtensions");
+               if (
+                  !Array.isArray(convertToExtensions) ||
+                  convertToExtensions.length === 0
+               )
+                  return;
+               const fileObject = AB.objectFile();
+               const parsedPathFile = path.parse(pathFile);
+               convertToExtensions.forEach(async (e) => {
+                  if (!fileObject.validExtension(e))
+                     throw new Error(`The file extension "${e}" is invalid.`);
+                  const newPathFile = path.join(
+                     parsedPathFile.dir,
+                     `${parsedPathFile.name}.${e}`
+                  );
+                  imageUtils.convert(pathFile, newPathFile);
+               });
+            } catch (err2) {
+               req.notify.developer(err2, {
+                  context: errorContext,
+               });
+            }
          });
       } catch (err) {
          req.notify.developer(err, {
