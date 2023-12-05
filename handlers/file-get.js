@@ -77,7 +77,6 @@ module.exports = {
          }
          let filePath = file.pathFile;
          const parsedFilePath = path.parse(filePath);
-         const newFileExtension = req.param("extension");
          switch (file.type) {
             case "image/heic":
             case "image/jpeg":
@@ -85,9 +84,10 @@ module.exports = {
             case "image/tiff":
             case "image/webp":
                {
+                  const newFileExtension = req.param("extension") || "webp";
                   const newFilePath = path.join(
                      parsedFilePath.dir,
-                     `${parsedFilePath.name}.${newFileExtension || "webp"}`
+                     `${parsedFilePath.name}.${newFileExtension}`
                   );
                   if (!fileObject.validExtension(newFilePath))
                      throw new Error(`The file extension "${newFileExtension}" is invalid.`);
