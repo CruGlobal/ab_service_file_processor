@@ -89,8 +89,9 @@ module.exports = {
                      parsedFilePath.dir,
                      `${parsedFilePath.name}.${newFileExtension}`
                   );
+                  errorContext = `The file extension "${newFileExtension}" is invalid.`;
                   if (!fileObject.validExtension(newFilePath))
-                     throw new Error(`The file extension "${newFileExtension}" is invalid.`);
+                     throw new Error(errorContext);
                   if (!(await pathUtils.checkPath(newFilePath))) {
                      if (await pathUtils.checkPath(filePath))
                         imageUtils.convert(filePath, newFilePath);
