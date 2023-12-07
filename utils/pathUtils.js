@@ -9,6 +9,20 @@ const path = require("path");
 module.exports = {
    /**
     * @function destPath
+    * return true if the path exists.
+    * @param {string} destPath
+    * @return {Promise<boolean>}
+    */
+   checkPath: async (destPath) =>
+      await new Promise((resolve) => {
+         fs.access(destPath, fs.F_OK, (error) => {
+            if (error != null) resolve(false);
+            resolve(true);
+         });
+      }),
+
+   /**
+    * @function destPath
     * return the destination path for files stored in the file_processor.
     * @param {ABUtils.Request} req
     * @return {string}

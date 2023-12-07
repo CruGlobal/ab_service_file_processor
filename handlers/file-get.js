@@ -2,11 +2,13 @@
  * file-get
  * our Request handler.
  */
-
+const path = require("path");
 const ABBootstrap = require("../AppBuilder/ABBootstrap");
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
+const imageUtils = require("../utils/imageUtils.js");
+const pathUtils = require("../utils/pathUtils.js");
 
 module.exports = {
    /**
@@ -35,6 +37,8 @@ module.exports = {
     */
    inputValidation: {
       uuid: { string: { uuid: true }, required: true },
+      extension: { string: true, optional: true },
+      needOriginalFile: { boolean: true, optional: true },
       // email: { string: { email: true }, optional: true },
    },
 
@@ -47,36 +51,66 @@ module.exports = {
     * @param {fn} cb
     *        a node style callback(err, results) to send data when job is finished
     */
-   fn: function handler(req, cb) {
+   fn: async function handler(req, cb) {
       req.log("file_processor.file-get:");
-
-      // get the AB for the current tenant
-      ABBootstrap.init(req)
-         .then((AB) => { // eslint-disable-line
-
-            var uuid = req.param("uuid");
-            var SiteFile = AB.objectFile().model();
-            req.retry(() => SiteFile.find({ uuid }))
-               .then((entry) => {
-                  // req.log(entry);
-                  if (entry.length) {
-                     cb(null, { url: entry[0].pathFile });
-                  } else {
-                     var err = new Error("File not found.");
-                     err.code = 404;
-                     cb(err);
-                  }
-               })
-               .catch((err) => {
-                  cb(err);
-               });
-         })
-         .catch((err) => {
-            req.notify.developer(err, {
-               context:
-                  "Service:file_processor.file-get: Error initializing ABFactory",
+      let errorContext = "Error initializing ABFactory.";
+      try {
+         // get the AB for the current tenant
+         const AB = await ABBootstrap.init(req);
+         const fileObject = AB.objectFile();
+         const SiteFile = fileObject.model();
+         const entry = await req.retry(() =>
+            SiteFile.find({ uuid: req.param("uuid") })
+         );
+         const file = entry[0];
+         if (file == null) {
+            const error = new Error("File not found.");
+            errorContext = error.message;
+            error.code = 404;
+            throw error;
+         }
+         if (req.param("needOriginalFile") ?? false) {
+            cb(null, {
+               url: file.pathFile,
             });
-            cb(err);
+            return;
+         }
+         let filePath = file.pathFile;
+         const parsedFilePath = path.parse(filePath);
+         switch (file.type) {
+            case "image/heic":
+            case "image/jpeg":
+            case "image/png":
+            case "image/tiff":
+            case "image/webp":
+               {
+                  const newFileExtension = req.param("extension") || "webp";
+                  const newFilePath = path.join(
+                     parsedFilePath.dir,
+                     `${parsedFilePath.name}.${newFileExtension}`
+                  );
+                  errorContext = `The file extension "${newFileExtension}" is invalid.`;
+                  if (!fileObject.validExtension(newFilePath))
+                     throw new Error(errorContext);
+                  if (!(await pathUtils.checkPath(newFilePath))) {
+                     if (await pathUtils.checkPath(filePath))
+                        imageUtils.convert(filePath, newFilePath);
+                     break;
+                  }
+                  filePath = newFilePath;
+               }
+               break;
+            default:
+               break;
+         }
+         cb(null, {
+            url: filePath,
          });
+      } catch (error) {
+         req.notify.developer(error, {
+            context: `Service:file_processor.file-get: ${errorContext}`,
+         });
+         cb(error);
+      }
    },
 };
