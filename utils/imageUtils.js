@@ -9,6 +9,11 @@ const path = require("path");
 module.exports = {
    convert: async (imagePath, newImagePath, quality, resize) => {
       const args = ["convert"];
+
+      // NOTE: Fix orient of image when convert from JPEG to WEBP
+      // https://bugs.chromium.org/p/webp/issues/detail?id=427
+      args.push("-auto-orient");
+
       if (quality != null) args.push(`-quality ${quality}`);
       if (resize != null) args.push(`-resize ${resize}`);
       args.push(imagePath, newImagePath);
