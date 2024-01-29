@@ -76,7 +76,12 @@ module.exports = {
             const contents = await fs.readFile(filePath, {
                encoding: "base64",
             });
-            return cb(null, { image: contents });
+            return cb(null, {
+               uuid: entry.uuid,
+               file: entry.file,
+               type: entry.type,
+               contents,
+            });
          } catch (err) {
             req.notify.developer(err, {
                context: `Service:${serviceKey}: Error reading file '${filePath}'`,

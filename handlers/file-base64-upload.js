@@ -187,7 +187,7 @@ module.exports = {
                   cb(err);
                } else {
                   let returnID = results?.uuid || uuid;
-                  cb(null, { uuid: returnID });
+                  cb(null, { uuid: returnID, file: fileName, type, });
                }
             }
          );
