@@ -24,4 +24,17 @@ module.exports = {
          });
       });
    },
+
+   rotate: async (imagePath, newImagePath, direction = "left") => {
+      const degree = (direction == "left" ? 270 : 90);
+      const cmd = `convert ${imagePath} -rotate ${degree} ${newImagePath}`;
+
+      return await new Promise((resolve, reject) => {
+         exec(cmd, (error) => {
+            if (error) reject(error);
+            resolve();
+         });
+      });
+
+   }
 };
