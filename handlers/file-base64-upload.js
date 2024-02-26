@@ -104,9 +104,7 @@ module.exports = {
                         });
                         next(err);
                      } else {
-                        req.notify.developer({
-                           context: `Service:${serviceKey}: File written successfully '${pathFile}'`,
-                        });
+                        req.log(`Service:${serviceKey}: File written successfully '${pathFile}'`);
                         next();
                      }
                   });
