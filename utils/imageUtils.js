@@ -16,7 +16,7 @@ module.exports = {
 
       if (quality != null) args.push(`-quality ${quality}`);
       if (resize != null) args.push(`-resize ${resize}`);
-      args.push(imagePath, newImagePath);
+      args.push(`"${imagePath}"`, `"${newImagePath}"`);
       await new Promise((resolve, reject) => {
          exec(args.join(" "), (error) => {
             if (error) reject(error);
@@ -26,8 +26,8 @@ module.exports = {
    },
 
    rotate: async (imagePath, newImagePath, direction = "left") => {
-      const degree = (direction == "left" ? 270 : 90);
-      const cmd = `convert ${imagePath} -rotate ${degree} ${newImagePath}`;
+      const degree = direction == "left" ? 270 : 90;
+      const cmd = `convert "${imagePath}" -rotate ${degree} "${newImagePath}"`;
 
       return await new Promise((resolve, reject) => {
          exec(cmd, (error) => {
@@ -35,6 +35,5 @@ module.exports = {
             resolve();
          });
       });
-
-   }
+   },
 };
