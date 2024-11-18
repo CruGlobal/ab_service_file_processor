@@ -60,7 +60,7 @@ module.exports = {
          const fileObject = AB.objectFile();
          const SiteFile = fileObject.model();
          const entry = await req.retry(() =>
-            SiteFile.find({ uuid: req.param("uuid") })
+            SiteFile.find({ uuid: req.param("uuid") }),
          );
          const file = entry[0];
          if (file == null) {
@@ -87,7 +87,7 @@ module.exports = {
                   const newFileExtension = req.param("extension") || "webp";
                   const newFilePath = path.join(
                      parsedFilePath.dir,
-                     `${parsedFilePath.name}.${newFileExtension}`
+                     `${parsedFilePath.name}.${newFileExtension}`,
                   );
                   errorContext = `The file extension "${newFileExtension}" is invalid.`;
                   if (!fileObject.validExtension(newFilePath))
@@ -95,7 +95,7 @@ module.exports = {
                   if (!(await pathUtils.checkPath(newFilePath))) {
                      if (await pathUtils.checkPath(filePath))
                         imageUtils.convert(filePath, newFilePath);
-                     break;
+                     // break;
                   }
                   filePath = newFilePath;
                }
