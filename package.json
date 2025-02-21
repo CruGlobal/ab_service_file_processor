@@ -1,6 +1,6 @@
 {
   "name": "file_processor",
-  "version": "1.1.86+p10702",
+  "version": "1.1.87+p10703",
   "description": "A service to manage uploaded files.",
   "main": "app.js",
   "author": "Johnny Hausman",
