@@ -1,12 +1,13 @@
 {
   "name": "file_processor",
-  "version": "1.1.118",
+  "version": "1.1.139+p11305",
   "description": "A service to manage uploaded files.",
   "main": "app.js",
   "author": "Johnny Hausman",
   "license": "MIT",
   "dependencies": {
     "@digiserve/ab-utils": "github:CruGlobal/ab-utils#e163c3d038b7f4382a5c533560425c2055df05b7",
+    "cote": "^1.0.2",
     "jimp": "^0.22.10",
     "knex": "^0.95.4",
     "lodash": "^4.17.13",
@@ -14,7 +15,7 @@
     "mysql": "^2.17.1",
     "nodemon": "^2.0.4",
     "objection": "github:Hiro-Nakamura/objection.js#fixDBErrors",
-    "semver": "^7.7.2",
+    "semver": "^7.7.3",
     "xml-js": "^1.6.11"
   },
   "scripts": {
