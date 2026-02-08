@@ -75,7 +75,7 @@ module.exports = {
                   SiteFile.update(results.uuid, {
                      object: null,
                      field: null,
-                  })
+                  }),
                );
                errorContext =
                   "Service:file_processor.image-upload: Error converting uploaded image";
@@ -92,7 +92,7 @@ module.exports = {
                      throw new Error(`The file extension "${e}" is invalid.`);
                   const newPathFile = path.join(
                      parsedPathFile.dir,
-                     `${parsedPathFile.name}.${e}`
+                     `${parsedPathFile.name}.${e}`,
                   );
                   imageUtils.convert(pathFile, newPathFile);
                });

@@ -43,7 +43,7 @@ describe("file_processor: model", function () {
                // make sure this error is as expected.
                expect(err).to.have.property(
                   "message",
-                  "No dbConnection defined."
+                  "No dbConnection defined.",
                );
                done();
             });
@@ -113,7 +113,7 @@ describe("file_processor: model", function () {
                // make sure this error is as expected.
                expect(err).to.have.property(
                   "message",
-                  "Database error or some sort"
+                  "Database error or some sort",
                );
                done();
             });

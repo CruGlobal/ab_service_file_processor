@@ -54,7 +54,7 @@ module.exports = {
          var object = AB.objectByID(objID);
          if (!object) {
             var errObj = new Error(
-               "file_processor.file_upload: unknown object reference"
+               "file_processor.file_upload: unknown object reference",
             );
             req.notify.builder(errObj, {
                object: objID,
@@ -66,7 +66,7 @@ module.exports = {
          var field = object.fieldByID(fieldID);
          if (!field) {
             var errField = new Error(
-               "file_processor.file_upload: unknown field reference"
+               "file_processor.file_upload: unknown field reference",
             );
             req.notify.builder(errField, {
                object,
@@ -87,6 +87,8 @@ module.exports = {
          const fileName = req.param("fileName");
          const uploadedBy = req.param("uploadedBy") ?? req.user.username;
 
+         var pathFile;
+
          async.series(
             {
                // make sure destination directory is created
@@ -104,7 +106,9 @@ module.exports = {
                         });
                         next(err);
                      } else {
-                        req.log(`Service:${serviceKey}: File written successfully '${pathFile}'`);
+                        req.log(
+                           `Service:${serviceKey}: File written successfully '${pathFile}'`,
+                        );
                         next();
                      }
                   });
@@ -134,7 +138,7 @@ module.exports = {
                         } else {
                            next();
                         }
-                     }
+                     },
                   );
                },
                // store file entry in DB
@@ -185,9 +189,9 @@ module.exports = {
                   cb(err);
                } else {
                   let returnID = results?.uuid || uuid;
-                  cb(null, { uuid: returnID, file: fileName, type, });
+                  cb(null, { uuid: returnID, file: fileName, type });
                }
-            }
+            },
          );
       } catch (err) {
          req.notify.developer(err, {

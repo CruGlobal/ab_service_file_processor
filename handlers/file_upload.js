@@ -69,7 +69,7 @@ module.exports = {
             var object = AB.objectByID(objID);
             if (!object) {
                var errObj = new Error(
-                  "file_processor.file_upload: unknown object reference"
+                  "file_processor.file_upload: unknown object reference",
                );
                req.notify.builder(errObj, {
                   object: req.param("object"),
@@ -83,7 +83,7 @@ module.exports = {
                var field = object.fieldByID(fieldID);
                if (!field) {
                   var errField = new Error(
-                     "file_processor.file_upload: unknown field reference"
+                     "file_processor.file_upload: unknown field reference",
                   );
                   req.notify.builder(errField, {
                      object,
@@ -128,7 +128,7 @@ module.exports = {
                            } else {
                               next();
                            }
-                        }
+                        },
                      );
                   },
 
@@ -149,7 +149,7 @@ module.exports = {
                            });
                         } else {
                            req.log(
-                              `moved file [${tempPath}] -> [${pathFile}] `
+                              `moved file [${tempPath}] -> [${pathFile}] `,
                            );
                         }
                         next(err);
@@ -196,7 +196,7 @@ module.exports = {
                   } else {
                      cb(null, { uuid: results.uuid });
                   }
-               }
+               },
             );
          })
          .catch((err) => {

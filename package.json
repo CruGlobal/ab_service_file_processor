@@ -1,46 +1,53 @@
 {
-  "name": "file_processor",
-  "version": "1.1.139+p11305",
-  "description": "A service to manage uploaded files.",
-  "main": "app.js",
-  "author": "Johnny Hausman",
-  "license": "MIT",
-  "dependencies": {
-    "@digiserve/ab-utils": "^1.9.1",
-    "cote": "^1.0.2",
-    "jimp": "^0.22.10",
-    "knex": "^0.95.4",
-    "lodash": "^4.17.13",
-    "moment": "^2.29.1",
-    "mysql": "^2.17.1",
-    "nodemon": "^2.0.4",
-    "objection": "github:Hiro-Nakamura/objection.js#fixDBErrors",
-    "semver": "^7.7.3",
-    "xml-js": "^1.6.11"
-  },
-  "scripts": {
-    "test": "run-p lint custom-tests",
-    "lint": "eslint . --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
-    "custom-tests": "./node_modules/.bin/mocha --reporter dot test/bootstrap.test.js test/**/*.js",
-    "dev": "node_modules/.bin/nodemon --inspect=0.0.0.0:9229 app.js",
-    "devBrk": "node --inspect-brk=0.0.0.0:9229 app.js",
-    "devBuild": "run-script-os",
-    "devInstall": "run-script-os",
-    "devBuild:win32": "docker run -it --mount type=bind,source=%cd%,target=/app -w /app node /bin/bash -c \"npm i --force && cd AppBuilder && npm i --force\"",
-    "devInstall:win32": "docker run -it --mount type=bind,source=%cd%,target=/app -w /app node bash",
-    "devBuild:darwin:linux": "docker run -it --mount type=bind,source=\"$(pwd)\",target=/app -w /app node /bin/bash -c \"npm i --force && cd AppBuilder && npm i --force\"",
-    "devInstall:darwin:linux": "docker run -it --mount type=bind,source=\"$(pwd)\",target=/app -w /app node bash",
-    "submoduleNPMInstall": "cd AppBuilder && npm i --force"
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "eslint": "^7.7.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-prettier": "^3.1.2",
-    "mocha": "^8.1.2",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.1.1",
-    "rimraf": "^3.0.2",
-    "run-script-os": "^1.0.7"
-  }
+   "name": "file_processor",
+   "version": "1.1.139+p11305",
+   "description": "A service to manage uploaded files.",
+   "main": "app.js",
+   "author": "Johnny Hausman",
+   "license": "MIT",
+   "dependencies": {
+      "@digiserve/ab-utils": "github:CruGlobal/ab-utils#1.10.2",
+      "cote": "^1.2.0",
+      "jimp": "^0.22.10",
+      "knex": "^2.4.0",
+      "lodash": "^4.17.21",
+      "moment": "^2.29.1",
+      "mysql": "^2.18.1",
+      "objection": "^3.1.5",
+      "semver": "^7.7.3",
+      "xml-js": "^1.6.11"
+   },
+   "scripts": {
+      "test": "run-p lint custom-tests",
+      "lint": "eslint . --fix --max-warnings=0 --report-unused-disable-directives && echo '✔  Your .js files look good.'",
+      "custom-tests": "./node_modules/.bin/mocha --reporter dot test/bootstrap.test.js test/**/*.js",
+      "dev": "node_modules/.bin/nodemon --inspect=0.0.0.0:9229 app.js",
+      "devBrk": "node --inspect-brk=0.0.0.0:9229 app.js",
+      "devBuild": "run-script-os",
+      "devInstall": "run-script-os",
+      "devBuild:win32": "docker run -it --mount type=bind,source=%cd%,target=/app -w /app node /bin/bash -c \"npm i --force && cd AppBuilder && npm i --force\"",
+      "devInstall:win32": "docker run -it --mount type=bind,source=%cd%,target=/app -w /app node bash",
+      "devBuild:darwin:linux": "docker run -it --mount type=bind,source=\"$(pwd)\",target=/app -w /app node /bin/bash -c \"npm i --force && cd AppBuilder && npm i --force\"",
+      "devInstall:darwin:linux": "docker run -it --mount type=bind,source=\"$(pwd)\",target=/app -w /app node bash",
+      "submoduleNPMInstall": "cd AppBuilder && npm i --force"
+   },
+   "devDependencies": {
+      "chai": "^4.3.7",
+      "eslint": "^9.26.0",
+      "eslint-config-prettier": "^10.1.8",
+      "eslint-plugin-prettier": "^5.4.0",
+      "mocha": "^10.4.0",
+      "npm-run-all": "^4.1.5",
+      "prettier": "^3.0.0",
+      "rimraf": "^3.0.2",
+      "run-script-os": "^1.1.5",
+      "@eslint/js": "^9.15.0",
+      "globals": "^16.0.0",
+      "nodemon": "^3.1.11"
+   },
+   "overrides": {
+      "@opentelemetry/api": "^1.7.0",
+      "glob": "^13.0.0",
+      "acorn-import-assertions": "npm:acorn-import-attributes@^1.9.5"
+   }
 }

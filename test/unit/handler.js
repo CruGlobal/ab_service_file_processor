@@ -9,13 +9,9 @@ var path = require("path");
 var rimraf = require("rimraf");
 
 // Base config value.
-var defaultConfig = require(path.join(
-   __dirname,
-   "..",
-   "..",
-   "config",
-   "file_processor"
-));
+var defaultConfig = require(
+   path.join(__dirname, "..", "..", "config", "file_processor"),
+);
 
 var basePath = path.join(__dirname, "..", "testDir");
 var testReq = {
@@ -73,7 +69,9 @@ describe("file_processor: handler", function () {
             expect(response).to.exist;
             // expect(response).to.have.property("uuid", "app2");
             expect(
-               fs.existsSync(path.join(basePath, "tenant", "appKey", "app2.js"))
+               fs.existsSync(
+                  path.join(basePath, "tenant", "appKey", "app2.js"),
+               ),
             ).to.be.true;
 
             done();
@@ -153,7 +151,7 @@ function resetFileTest(options) {
    // copy our expected test file so we don't loose it.
    fs.copyFileSync(
       path.join(basePath, "tmp", "testFile.js"),
-      path.join(basePath, "tmp", options.uuid + ".js")
+      path.join(basePath, "tmp", options.uuid + ".js"),
    );
 
    // send config settings that point to that directory
