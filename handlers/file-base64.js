@@ -137,6 +137,7 @@ async function checkFileAccess(path) {
    try {
       await fs.access(path, fs.constants.R_OK);
       return true;
+      // eslint-disable-next-line no-unused-vars
    } catch (err) {
       return false;
    }

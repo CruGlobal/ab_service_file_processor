@@ -47,45 +47,42 @@ module.exports = {
       const direction = req.param("direction");
 
       try {
-        // get the AB for the current tenant
-        const AB = await ABBootstrap.init(req);
+         // get the AB for the current tenant
+         const AB = await ABBootstrap.init(req);
 
-        // Get file path
-        const fileObject = AB.objectFile();
-        const SiteFile = fileObject.model();
-        const entry = await req.retry(() =>
-            SiteFile.find({ uuid: fileId })
-        );
-        const file = entry[0];
-        if (file == null) {
-           const error = new Error("File info not found.");
-           error.code = 404;
-           throw error;
-        }
-        const filePath = file.pathFile;
+         // Get file path
+         const fileObject = AB.objectFile();
+         const SiteFile = fileObject.model();
+         const entry = await req.retry(() => SiteFile.find({ uuid: fileId }));
+         const file = entry[0];
+         if (file == null) {
+            const error = new Error("File info not found.");
+            error.code = 404;
+            throw error;
+         }
+         const filePath = file.pathFile;
 
-        // Webp file path
-        const parsedFilePath = path.parse(filePath);
-        const webpFilePath = path.join(
+         // Webp file path
+         const parsedFilePath = path.parse(filePath);
+         const webpFilePath = path.join(
             parsedFilePath.dir,
-            `${parsedFilePath.name}.webp`
+            `${parsedFilePath.name}.webp`,
          );
 
-        // Verify image exists
-        if (!(await pathUtils.checkPath(webpFilePath))) {
+         // Verify image exists
+         if (!(await pathUtils.checkPath(webpFilePath))) {
             const error = new Error("webp format file not found.");
             error.code = 404;
-            throw error; 
-        }
+            throw error;
+         }
 
-        // Rotate the image
+         // Rotate the image
          await imageUtils.rotate(webpFilePath, webpFilePath, direction);
 
          cb();
       } catch (err) {
          req.notify.developer(err, {
-            context:
-               `Service:file_processor.image-rotate: Error rotating Image file Id: ${fileId}, Direction: ${direction}`,
+            context: `Service:file_processor.image-rotate: Error rotating Image file Id: ${fileId}, Direction: ${direction}`,
          });
          cb(err);
       }

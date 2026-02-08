@@ -75,7 +75,7 @@ module.exports = {
       var destPath = path.join(
          config.basePath,
          req.data.tenant,
-         req.data.appKey
+         req.data.appKey,
       );
 
       var uuid; // the new uuid of the file
@@ -104,14 +104,14 @@ module.exports = {
                var tempPath = path.join(
                   config.basePath,
                   config.uploadPath,
-                  req.data.name
+                  req.data.name,
                );
                var newPath = path.join(destPath, req.data.name);
                fs.rename(tempPath, newPath, function (err) {
                   if (err) {
                      req.log(
                         `Error moving file [${tempPath}] -> [${newPath}] `,
-                        err
+                        err,
                      );
                   } else {
                      req.log(`moved file [${tempPath}] -> [${newPath}] `);
@@ -158,7 +158,7 @@ module.exports = {
             } else {
                cb(null, { uuid });
             }
-         }
+         },
       );
 
       // cb(null, { uuid: "123456" });

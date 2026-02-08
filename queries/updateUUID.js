@@ -28,7 +28,7 @@ update ${tenantDB}\`SITE_FILE\`
 SET \`uuid\` = ?
 WHERE \`uuid\` = ?`;
 
-      req.query(sql, [to, from], (error, results, fields) => {
+      req.query(sql, [to, from], (error, results /*fields*/) => {
          if (error) {
             req.log(sql);
             reject(error);
