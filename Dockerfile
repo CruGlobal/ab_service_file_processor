@@ -48,7 +48,9 @@ RUN npm ci && npm cache clean --force
 WORKDIR /app
 
 # Security: run as non-root (base image should provide node user)
-RUN chown -R node:node /app
+# Default FILE_PROCESSOR_PATH is /data; ensure node can create tenant dirs (e.g. /data/admin)
+RUN chown -R node:node /app \
+   && mkdir -p /data && chown node:node /data
 USER node
 
 # --inspect=0.0.0.0:9229 exposes debugger to the network; omit in production or bind to 127.0.0.1
