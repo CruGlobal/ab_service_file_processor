@@ -4,7 +4,7 @@
  * files.
  */
 const { exec } = require("child_process");
-const path = require("path");
+// const path = require("path");
 
 module.exports = {
    convert: async (imagePath, newImagePath, quality, resize) => {

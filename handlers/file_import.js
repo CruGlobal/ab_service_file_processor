@@ -129,7 +129,7 @@ module.exports = {
                      return cb(err);
                   }
                   cb(null, { status: "success" });
-               }
+               },
             );
          })
          .catch((err) => {
