@@ -1,6 +1,6 @@
 {
   "name": "file_processor",
-  "version": "1.1.139+p11305",
+  "version": "1.1.140",
   "description": "A service to manage uploaded files.",
   "main": "app.js",
   "author": "Johnny Hausman",
@@ -15,7 +15,7 @@
     "mysql": "^2.17.1",
     "nodemon": "^2.0.4",
     "objection": "github:Hiro-Nakamura/objection.js#fixDBErrors",
-    "semver": "^7.7.3",
+    "semver": "^7.7.4",
     "xml-js": "^1.6.11"
   },
   "scripts": {
