@@ -3,8 +3,8 @@ name: Build & Deploy ECS
 on:
   push:
     branches:
-      # Automatically build master and staging. Additional branches may be added.
-      - master
+      # Automatically build main and staging. Additional branches may be added.
+      - main
       - staging
   workflow_dispatch:
     # Allows manual build and deploy of any branch/ref
