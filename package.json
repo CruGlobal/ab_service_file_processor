@@ -48,6 +48,8 @@
    "overrides": {
       "@opentelemetry/api": "^1.7.0",
       "glob": "^13.0.0",
-      "acorn-import-assertions": "npm:acorn-import-attributes@^1.9.5"
+      "acorn-import-assertions": "npm:acorn-import-attributes@^1.9.5",
+      "bfj": "9.1.3",
+      "minimatch": "10.2.1"
    }
 }
