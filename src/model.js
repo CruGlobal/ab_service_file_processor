@@ -59,7 +59,7 @@ module.exports = {
                }
 
                resolve();
-            }
+            },
          );
       });
    },
@@ -93,7 +93,7 @@ module.exports = {
                }
 
                resolve(results);
-            }
+            },
          );
       });
    },

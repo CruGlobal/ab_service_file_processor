@@ -51,7 +51,7 @@ module.exports = {
       if (!config.enable) {
          // we shouldn't be getting notification.email messages
          console.log(
-            "WARN: file_processor job received, but config.enable is false."
+            "WARN: file_processor job received, but config.enable is false.",
          );
          err = new Error("file.upload service is disabled.");
          err.code = "EDISABLED";
@@ -86,7 +86,7 @@ module.exports = {
       var destPath = path.join(
          config.basePath,
          req.param.tenant,
-         req.param.appKey
+         req.param.appKey,
       );
 
       var uuid; // the new uuid of the file
@@ -115,7 +115,7 @@ module.exports = {
                var tempPath = path.join(
                   config.basePath,
                   config.uploadPath,
-                  req.param.name
+                  req.param.name,
                );
                var newPath = path.join(destPath, req.param.name);
                fs.rename(tempPath, newPath, function (err) {
@@ -156,7 +156,7 @@ module.exports = {
             } else {
                cb(null, { uuid });
             }
-         }
+         },
       );
 
       // cb(null, { uuid: "123456" });
