@@ -8,7 +8,7 @@
 
 // const Model = require(path.join(__dirname, "model"));
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */

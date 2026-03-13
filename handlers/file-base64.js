@@ -3,16 +3,15 @@
  * return a file as base64
  * our Request handler.
  */
-const fs = require("fs/promises");
-const Jimp = require("jimp");
-
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import fs from "fs/promises";
+import Jimp from "jimp";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
 const serviceKey = "file_processor.file-base64";
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */

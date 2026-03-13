@@ -2,8 +2,9 @@
  * model.js
  * define our DB operations.
  */
-const AB = require("@digiserve/ab-utils");
-module.exports = {
+import AB from "@digiserve/ab-utils";
+
+export default {
    table_name: "op_fileupload",
    attributes: {
       uuid: { type: "uuid", required: true },

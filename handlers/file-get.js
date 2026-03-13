@@ -2,15 +2,15 @@
  * file-get
  * our Request handler.
  */
-const path = require("path");
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import path from "path";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
-const imageUtils = require("../utils/imageUtils.js");
-const pathUtils = require("../utils/pathUtils.js");
+import imageUtils from "../utils/imageUtils.js";
+import pathUtils from "../utils/pathUtils.js";
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */

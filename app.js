@@ -3,9 +3,13 @@
 // A service to manage uploaded files.
 //
 // const path = require("path");
-const AB = require("@digiserve/ab-utils");
-const child_process = require("child_process");
-const { version } = require("./package");
+import AB from "@digiserve/ab-utils";
+import child_process from "child_process";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const { version } = require("./package.json");
+
 // Use sentry by default, but can override with env.TELEMETRY_PROVIDER
 if (AB.defaults.env("TELEMETRY_PROVIDER", "sentry") == "sentry") {
    AB.telemetry.init("sentry", {

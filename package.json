@@ -1,5 +1,6 @@
 {
    "name": "file_processor",
+   "type": "module",
    "version": "1.2.4+p11406.c21300",
    "description": "A service to manage uploaded files.",
    "main": "app.js",

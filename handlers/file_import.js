@@ -2,19 +2,17 @@
  * file_import
  * our Request handler.
  */
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
-
-const PathUtils = require("../utils/pathUtils.js");
-const SQLUpdateUUID = require("../queries/updateUUID.js");
-
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import async from "async";
+import fs from "fs";
+import path from "path";
+import PathUtils from "../utils/pathUtils.js";
+import SQLUpdateUUID from "../queries/updateUUID.js";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */
