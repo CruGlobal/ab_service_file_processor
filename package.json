@@ -1,7 +1,7 @@
 {
    "name": "file_processor",
    "type": "module",
-   "version": "1.2.5+p11407",
+   "version": "1.2.8+p11410",
    "description": "A service to manage uploaded files.",
    "main": "app.js",
    "author": "Johnny Hausman",
