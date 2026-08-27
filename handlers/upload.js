@@ -2,13 +2,13 @@
  * handler
  * our Request handler.
  */
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
+import async from "async";
+import fs from "fs";
+import path from "path";
 
 // const Model = require(path.join(__dirname, "model"));
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */

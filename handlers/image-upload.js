@@ -2,16 +2,15 @@
  * image-upload
  * our Request handler for images being uploaded by the ABDesigner.
  */
-const path = require("path");
-const Handler_File_Upload = require("./file_upload.js");
-
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import path from "path";
+import Handler_File_Upload from "./file_upload.js";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
-const imageUtils = require("../utils/imageUtils.js");
+import imageUtils from "../utils/imageUtils.js";
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */

@@ -3,19 +3,18 @@
  * upload a file as base64
  * our Request handler.
  */
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
-const PathUtils = require("../utils/pathUtils.js");
-const child_process = require("child_process");
-
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import async from "async";
+import fs from "fs";
+import path from "path";
+import PathUtils from "../utils/pathUtils.js";
+import child_process from "child_process";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
 const serviceKey = "file_processor.file-base64-upload"; // this is how listeners will identify this service.
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */

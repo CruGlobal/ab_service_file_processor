@@ -3,19 +3,17 @@
  * our Request handler.
  */
 
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
-const child_process = require("child_process");
-
-const PathUtils = require("../utils/pathUtils.js");
-
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import async from "async";
+import fs from "fs";
+import path from "path";
+import child_process from "child_process";
+import PathUtils from "../utils/pathUtils.js";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */

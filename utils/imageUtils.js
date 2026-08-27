@@ -1,12 +1,12 @@
 /*
- * pathUtils.js
+ * imageUtils.js
  * A common set of utility functions related to uploading / importing
  * files.
  */
-const { exec } = require("child_process");
+import { exec } from "child_process";
 // const path = require("path");
 
-module.exports = {
+export default {
    convert: async (imagePath, newImagePath, quality, resize) => {
       const args = ["convert"];
 

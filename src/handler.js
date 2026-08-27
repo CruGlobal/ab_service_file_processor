@@ -2,15 +2,14 @@
  * handler
  * our Request handler.
  */
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
+import async from "async";
+import fs from "fs";
+import path from "path";
+import Model from "./model.js";
 
 var config;
 
-const Model = require(path.join(__dirname, "model"));
-
-module.exports = {
+export default {
    /**
     * init
     * setup our configuration & connections
@@ -63,7 +62,7 @@ module.exports = {
       /*
             if (!req.email) {
               var err2 = new Error(
-                ".email parameter required in file.upload service."
+                ".email parameter required in file.upload service.
               );
               err2.code = "EMISSINGPARAM";
               cb(err2);
@@ -72,14 +71,14 @@ module.exports = {
          */
 
       /*
-         * perform action here.
-         *
-         * when job is finished then:
-         cb(null, { status: "success" });
+       * perform action here.
+       *
+       * when job is finished then:
+       cb(null, { status: "success" });
 
-         * or if error then:
-         cb(err, { status: "error", error: err });
-         */
+       * or if error then:
+       cb(err, { status: "error", error: err });
+       */
 
       console.log("jobData : ", req);
 
