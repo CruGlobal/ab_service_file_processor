@@ -3,19 +3,17 @@
  * our Request handler.
  */
 
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
-const child_process = require("child_process");
-
-const PathUtils = require("../utils/pathUtils.js");
-
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import async from "async";
+import fs from "fs";
+import path from "path";
+import child_process from "child_process";
+import PathUtils from "../utils/pathUtils.js";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */
@@ -69,7 +67,7 @@ module.exports = {
             var object = AB.objectByID(objID);
             if (!object) {
                var errObj = new Error(
-                  "file_processor.file_upload: unknown object reference"
+                  "file_processor.file_upload: unknown object reference",
                );
                req.notify.builder(errObj, {
                   object: req.param("object"),
@@ -83,7 +81,7 @@ module.exports = {
                var field = object.fieldByID(fieldID);
                if (!field) {
                   var errField = new Error(
-                     "file_processor.file_upload: unknown field reference"
+                     "file_processor.file_upload: unknown field reference",
                   );
                   req.notify.builder(errField, {
                      object,
@@ -128,7 +126,7 @@ module.exports = {
                            } else {
                               next();
                            }
-                        }
+                        },
                      );
                   },
 
@@ -149,7 +147,7 @@ module.exports = {
                            });
                         } else {
                            req.log(
-                              `moved file [${tempPath}] -> [${pathFile}] `
+                              `moved file [${tempPath}] -> [${pathFile}] `,
                            );
                         }
                         next(err);
@@ -196,7 +194,7 @@ module.exports = {
                   } else {
                      cb(null, { uuid: results.uuid });
                   }
-               }
+               },
             );
          })
          .catch((err) => {

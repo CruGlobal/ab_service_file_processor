@@ -13,7 +13,7 @@
  * 		  the new uuid value.
  *
  */
-module.exports = function (req, from, to) {
+export default function (req, from, to) {
    return new Promise((resolve, reject) => {
       let tenantDB = req.queryTenantDB(reject);
       if (!tenantDB) {
@@ -28,7 +28,7 @@ update ${tenantDB}\`SITE_FILE\`
 SET \`uuid\` = ?
 WHERE \`uuid\` = ?`;
 
-      req.query(sql, [to, from], (error, results, fields) => {
+      req.query(sql, [to, from], (error, results /*fields*/) => {
          if (error) {
             req.log(sql);
             reject(error);
@@ -37,4 +37,4 @@ WHERE \`uuid\` = ?`;
          }
       });
    });
-};
+}

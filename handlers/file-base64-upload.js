@@ -3,19 +3,18 @@
  * upload a file as base64
  * our Request handler.
  */
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
-const PathUtils = require("../utils/pathUtils.js");
-const child_process = require("child_process");
-
-const ABBootstrap = require("../AppBuilder/ABBootstrap");
+import async from "async";
+import fs from "fs";
+import path from "path";
+import PathUtils from "../utils/pathUtils.js";
+import child_process from "child_process";
+import ABBootstrap from "../AppBuilder/ABBootstrap.js";
 // {ABBootstrap}
 // responsible for initializing and returning an {ABFactory} that will work
 // with the current tenant for the incoming request.
 const serviceKey = "file_processor.file-base64-upload"; // this is how listeners will identify this service.
 
-module.exports = {
+export default {
    /**
     * Key: the cote message key we respond to.
     */
@@ -54,7 +53,7 @@ module.exports = {
          var object = AB.objectByID(objID);
          if (!object) {
             var errObj = new Error(
-               "file_processor.file_upload: unknown object reference"
+               "file_processor.file_upload: unknown object reference",
             );
             req.notify.builder(errObj, {
                object: objID,
@@ -66,7 +65,7 @@ module.exports = {
          var field = object.fieldByID(fieldID);
          if (!field) {
             var errField = new Error(
-               "file_processor.file_upload: unknown field reference"
+               "file_processor.file_upload: unknown field reference",
             );
             req.notify.builder(errField, {
                object,
@@ -87,6 +86,8 @@ module.exports = {
          const fileName = req.param("fileName");
          const uploadedBy = req.param("uploadedBy") ?? req.user.username;
 
+         var pathFile;
+
          async.series(
             {
                // make sure destination directory is created
@@ -104,7 +105,9 @@ module.exports = {
                         });
                         next(err);
                      } else {
-                        req.log(`Service:${serviceKey}: File written successfully '${pathFile}'`);
+                        req.log(
+                           `Service:${serviceKey}: File written successfully '${pathFile}'`,
+                        );
                         next();
                      }
                   });
@@ -134,7 +137,7 @@ module.exports = {
                         } else {
                            next();
                         }
-                     }
+                     },
                   );
                },
                // store file entry in DB
@@ -185,9 +188,9 @@ module.exports = {
                   cb(err);
                } else {
                   let returnID = results?.uuid || uuid;
-                  cb(null, { uuid: returnID, file: fileName, type, });
+                  cb(null, { uuid: returnID, file: fileName, type });
                }
-            }
+            },
          );
       } catch (err) {
          req.notify.developer(err, {

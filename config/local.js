@@ -1,11 +1,12 @@
 /*
  * File_Processor
  */
-const AB = require("@digiserve/ab-utils");
-const env = AB.defaults.env;
-const path = require("path");
+import AB from "@digiserve/ab-utils";
+import path from "path";
 
-module.exports = {
+const env = AB.defaults.env;
+
+export default {
    file_processor: {
       /*************************************************************************/
       /* enable: {bool} is this service active?                                */

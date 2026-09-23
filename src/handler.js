@@ -2,15 +2,14 @@
  * handler
  * our Request handler.
  */
-const async = require("async");
-const fs = require("fs");
-const path = require("path");
+import async from "async";
+import fs from "fs";
+import path from "path";
+import Model from "./model.js";
 
 var config;
 
-const Model = require(path.join(__dirname, "model"));
-
-module.exports = {
+export default {
    /**
     * init
     * setup our configuration & connections
@@ -51,7 +50,7 @@ module.exports = {
       if (!config.enable) {
          // we shouldn't be getting notification.email messages
          console.log(
-            "WARN: file_processor job received, but config.enable is false."
+            "WARN: file_processor job received, but config.enable is false.",
          );
          err = new Error("file.upload service is disabled.");
          err.code = "EDISABLED";
@@ -63,7 +62,7 @@ module.exports = {
       /*
             if (!req.email) {
               var err2 = new Error(
-                ".email parameter required in file.upload service."
+                ".email parameter required in file.upload service.
               );
               err2.code = "EMISSINGPARAM";
               cb(err2);
@@ -72,21 +71,21 @@ module.exports = {
          */
 
       /*
-         * perform action here.
-         *
-         * when job is finished then:
-         cb(null, { status: "success" });
+       * perform action here.
+       *
+       * when job is finished then:
+       cb(null, { status: "success" });
 
-         * or if error then:
-         cb(err, { status: "error", error: err });
-         */
+       * or if error then:
+       cb(err, { status: "error", error: err });
+       */
 
       console.log("jobData : ", req);
 
       var destPath = path.join(
          config.basePath,
          req.param.tenant,
-         req.param.appKey
+         req.param.appKey,
       );
 
       var uuid; // the new uuid of the file
@@ -115,7 +114,7 @@ module.exports = {
                var tempPath = path.join(
                   config.basePath,
                   config.uploadPath,
-                  req.param.name
+                  req.param.name,
                );
                var newPath = path.join(destPath, req.param.name);
                fs.rename(tempPath, newPath, function (err) {
@@ -156,7 +155,7 @@ module.exports = {
             } else {
                cb(null, { uuid });
             }
-         }
+         },
       );
 
       // cb(null, { uuid: "123456" });

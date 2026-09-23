@@ -3,10 +3,10 @@
  * A common set of utility functions related to uploading / importing
  * files.
  */
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
-module.exports = {
+export default {
    /**
     * @function destPath
     * return true if the path exists.

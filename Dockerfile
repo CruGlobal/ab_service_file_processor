@@ -1,12 +1,21 @@
 ##
 ## digiserve/ab-file-processor
 ##
-## This is our microservice for our AppBuilder Definitions.
+## This is our microservice for our AppBuilder file processing.
+##
+## Security: image runs as non-root user (node). For production, prefer
+## pinning the base image by digest and overriding CMD to remove --inspect.
 ##
 ## Docker Commands:
 ## ---------------
 ## $ docker build -t digiserve/ab-file-processor:master .
 ## $ docker push digiserve/ab-file-processor:master
+##
+## Multi-platform (M1/M2/M3 Mac → amd64 + arm64):
+## $ docker buildx create --use  # once, if no builder
+## $ docker buildx build --provenance=true --sbom=true --platform linux/amd64,linux/arm64 -t digiserve/ab-file-processor:master --push .
+## Or use: $ DOCKER_ARGS="--platform linux/amd64,linux/arm64 --push" ./build.sh
+## Supply chain: use --provenance=true --sbom=true when pushing to a registry for Docker Hub attestations and license visibility.
 ##
 
 ARG BRANCH=master
@@ -20,16 +29,29 @@ RUN apt-get install -y clamav clamav-daemon imagemagick
 RUN mkdir /var/run/clamav
 RUN chown clamav:clamav /var/run/clamav
 
+# OCI labels for Docker Hub / Scout (license, description)
+LABEL org.opencontainers.image.title="File Processor" \
+   org.opencontainers.image.description="Service to manage uploaded files" \
+   org.opencontainers.image.licenses="MIT"
+
 COPY . /app
 
 WORKDIR /app
 
-RUN npm i -f
+# Reproducible install; use npm i -f only if npm ci fails (e.g. peer deps)
+RUN npm ci && npm cache clean --force
 
 WORKDIR /app/AppBuilder
 
-RUN npm i -f
+RUN npm ci && npm cache clean --force
 
 WORKDIR /app
 
+# Security: run as non-root (base image should provide node user)
+# Default FILE_PROCESSOR_PATH is /data; ensure node can create tenant dirs (e.g. /data/admin)
+RUN chown -R node:node /app \
+   && mkdir -p /data && chown node:node /data
+USER node
+
+# --inspect=0.0.0.0:9229 exposes debugger to the network; omit in production or bind to 127.0.0.1
 CMD [ "node", "--inspect=0.0.0.0:9229", "app.js" ]

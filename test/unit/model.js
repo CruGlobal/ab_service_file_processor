@@ -3,12 +3,10 @@
  * test the definitions for DB operations.
  */
 //var _ = require("lodash");
-var expect = require("chai").expect;
+import { expect } from "chai";
 //var fs = require("fs");
-var path = require("path");
-//var rimraf = require("rimraf");
 // Our model:
-var model = require(path.join(__dirname, "..", "..", "src", "model"));
+import model from "../../src/model.js";
 
 describe("file_processor: model", function () {
    //Test create functions:
@@ -43,7 +41,7 @@ describe("file_processor: model", function () {
                // make sure this error is as expected.
                expect(err).to.have.property(
                   "message",
-                  "No dbConnection defined."
+                  "No dbConnection defined.",
                );
                done();
             });
@@ -113,7 +111,7 @@ describe("file_processor: model", function () {
                // make sure this error is as expected.
                expect(err).to.have.property(
                   "message",
-                  "Database error or some sort"
+                  "Database error or some sort",
                );
                done();
             });

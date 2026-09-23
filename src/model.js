@@ -4,7 +4,7 @@
  */
 var dbConnection;
 
-module.exports = {
+export default {
    init: function (dbConn) {
       dbConnection = dbConn;
    },
@@ -59,7 +59,7 @@ module.exports = {
                }
 
                resolve();
-            }
+            },
          );
       });
    },
@@ -93,7 +93,7 @@ module.exports = {
                }
 
                resolve(results);
-            }
+            },
          );
       });
    },

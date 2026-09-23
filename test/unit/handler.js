@@ -2,20 +2,17 @@
  * Handler
  * test the interface for our default service handler.
  */
-var _ = require("lodash");
-var expect = require("chai").expect;
-var fs = require("fs");
-var path = require("path");
-var rimraf = require("rimraf");
+import path from "path";
+import { fileURLToPath } from "url";
+import _ from "lodash";
+import { expect } from "chai";
+import fs from "fs";
+import rimraf from "rimraf";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Base config value.
-var defaultConfig = require(path.join(
-   __dirname,
-   "..",
-   "..",
-   "config",
-   "file_processor"
-));
+import defaultConfig from "../../config/file_processor.js";
 
 var basePath = path.join(__dirname, "..", "testDir");
 var testReq = {
@@ -27,7 +24,7 @@ var testReq = {
 };
 
 // Our service handler:
-var Handler = require(path.join(__dirname, "..", "..", "src", "handler"));
+import Handler from "../../src/handler.js";
 
 describe("file_processor: handler", function () {
    // Check for proper initialization
@@ -46,7 +43,7 @@ describe("file_processor: handler", function () {
 
    // handle a disabled state:
    describe("-> disabled ", function () {
-      var disabledConfig = _.clone(defaultConfig, true);
+      var disabledConfig = _.cloneDeep(defaultConfig);
       disabledConfig.enable = false;
 
       it("should return an error when receiving a job request #disabled ", function (done) {
@@ -73,7 +70,9 @@ describe("file_processor: handler", function () {
             expect(response).to.exist;
             // expect(response).to.have.property("uuid", "app2");
             expect(
-               fs.existsSync(path.join(basePath, "tenant", "appKey", "app2.js"))
+               fs.existsSync(
+                  path.join(basePath, "tenant", "appKey", "app2.js"),
+               ),
             ).to.be.true;
 
             done();
@@ -153,7 +152,7 @@ function resetFileTest(options) {
    // copy our expected test file so we don't loose it.
    fs.copyFileSync(
       path.join(basePath, "tmp", "testFile.js"),
-      path.join(basePath, "tmp", options.uuid + ".js")
+      path.join(basePath, "tmp", options.uuid + ".js"),
    );
 
    // send config settings that point to that directory
